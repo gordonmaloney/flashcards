@@ -1,20 +1,32 @@
 import React, { useState } from "react";
 import { CARDS } from "./CARDS";
+import { USERS } from "./USERS";
 
 export const Flashcard = () => {
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState(false);
 
+  let userCards = [];
+  USERS[0].cards.map((usercard) => userCards.push(usercard.id));
+
+  let CARD = CARDS.filter((card) => userCards.includes(card.id))[index];
+  let USERCARD = USERS[0].cards.filter((card) => card.id == CARD.id)[0];
+
+  console.log(CARD, USERCARD);
+
   const handlePrev = () => {
     if (index == 0) {
-      setIndex(CARDS.length - 1);
+      setIndex(CARDS.filter((card) => userCards.includes(card.id)).length - 1);
     } else {
       setIndex(index - 1);
     }
   };
 
   const handleNext = () => {
-    if (index == CARDS.length - 1) {
+    if (
+      index ==
+      CARDS.filter((card) => userCards.includes(card.id)).length - 1
+    ) {
       setIndex(0);
     } else {
       setIndex(index + 1);
@@ -36,11 +48,11 @@ export const Flashcard = () => {
         }}
       >
         <center>
-          {CARDS[index].en}
+          {CARD.en}
           <br />
           {answer ? (
             <>
-              {CARDS[index].gd}
+              {CARD.gd}
               <br />
               <br />
             </>
@@ -70,10 +82,12 @@ export const Flashcard = () => {
           </button>
 
           <br />
+
           <button
             onClick={() => {
-              CARDS[index].date = new Date();;
-              CARDS[index].delay = 0;
+              USERCARD.date = new Date();
+              USERCARD.delay = 0;
+              USERCARD.reviews++;
               handleNext();
             }}
           >
@@ -81,8 +95,11 @@ export const Flashcard = () => {
           </button>
           <button
             onClick={() => {
-              CARDS[index].date.setDate(CARDS[index].date.getDate() + (CARDS[index].delay + 1)*2);
-              CARDS[index].delay = (CARDS[index].delay + 1)*2;
+              USERCARD.date.setDate(
+                USERCARD.date.getDate() + (USERCARD.delay + 1) * 2
+              );
+              USERCARD.delay = (USERCARD.delay + 1) * 2;
+              USERCARD.reviews++;
               handleNext();
             }}
           >
@@ -90,8 +107,11 @@ export const Flashcard = () => {
           </button>
           <button
             onClick={() => {
-              CARDS[index].date.setDate(CARDS[index].date.getDate() + (CARDS[index].delay + 1)*3);
-              CARDS[index].delay = (CARDS[index].delay + 1)*3;
+              USERCARD.date.setDate(
+                USERCARD.date.getDate() + (USERCARD.delay + 1) * 3
+              );
+              USERCARD.delay = (USERCARD.delay + 1) * 3;
+              USERCARD.reviews++;
               handleNext();
             }}
           >
@@ -100,25 +120,46 @@ export const Flashcard = () => {
         </center>
       </div>
 
-      {CARDS.map((card) => (
-        <>
-          {card.gd} - {card.en} - {card.date.toLocaleDateString()} -{" "}
-          {card.delay}
-          <br />
-        </>
-      ))}
+      <h1>Stats</h1>
 
-<br />
-Due today:
-<br />
-{CARDS.filter(card => card.date <= new Date()).map((card) => (
-        <>
-          {card.gd} - {card.en} - {card.date.toLocaleDateString()} -{" "}
-          {card.delay}
-          <br />
-        </>
-      ))}
-
+      <table>
+        <tr>
+          <th>Gaelic</th>
+          <th>English</th>
+          <th>Due</th>
+          <th>Delay</th>
+          <th>Reviews</th>
+        </tr>
+        All words:
+        <br />
+        {USERS[0].cards.map((card) => (
+          <tr>
+            <td>{CARDS.filter((cardDeck) => cardDeck.id == card.id)[0].gd}</td>
+            <td>{CARDS.filter((cardDeck) => cardDeck.id == card.id)[0].en}</td>
+            <td>{card.date.toLocaleDateString()}</td>
+            <td>{card.delay}</td>
+            <td>{card.reviews}</td>
+          </tr>
+        ))}
+        <br />
+        Due today:
+        <br />
+        {USERS[0].cards
+          .filter((card) => card.date <= new Date())
+          .map((card) => (
+            <tr>
+              <td>
+                {CARDS.filter((cardDeck) => cardDeck.id == card.id)[0].gd}
+              </td>
+              <td>
+                {CARDS.filter((cardDeck) => cardDeck.id == card.id)[0].en}
+              </td>
+              <td>{card.date.toLocaleDateString()}</td>
+              <td>{card.delay}</td>
+              <td>{card.reviews}</td>
+            </tr>
+          ))}
+      </table>
     </>
   );
 };
