@@ -72,30 +72,30 @@ export const Flashcard = () => {
           <br />
           <button
             onClick={() => {
-              CARDS[index].date.setDate(CARDS[index].date.getDate());
+              CARDS[index].date = new Date();;
               CARDS[index].delay = 0;
               handleNext();
             }}
           >
-            Hard
+            Wrong
           </button>
           <button
             onClick={() => {
-              CARDS[index].date.setDate(CARDS[index].date.getDate() + 1);
-              CARDS[index].delay = 1;
+              CARDS[index].date.setDate(CARDS[index].date.getDate() + (CARDS[index].delay + 1)*2);
+              CARDS[index].delay = (CARDS[index].delay + 1)*2;
+              handleNext();
+            }}
+          >
+            Correct
+          </button>
+          <button
+            onClick={() => {
+              CARDS[index].date.setDate(CARDS[index].date.getDate() + (CARDS[index].delay + 1)*3);
+              CARDS[index].delay = (CARDS[index].delay + 1)*3;
               handleNext();
             }}
           >
             Easy
-          </button>
-          <button
-            onClick={() => {
-              CARDS[index].date.setDate(CARDS[index].date.getDate() + 3);
-              CARDS[index].delay = 3;
-              handleNext();
-            }}
-          >
-            Really Easy
           </button>
         </center>
       </div>
