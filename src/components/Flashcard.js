@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { getPosts, updateComment, deleteComment } from "../actions/posts";
 import { CARDS } from "./CARDS";
 
@@ -15,14 +14,11 @@ export const Flashcard = () => {
   const user = users[0];
 
   const handleUpdate = (id, commentId, updatedPost) => {
-    console.log("handling...", id, commentId, updatedPost);
     dispatch(updateComment(id, commentId, updatedPost));
   };
 
-  const handleDelete = (id, commentId) => {
+  const handleDelete = (id, commentId, deletingCard) => {
     dispatch(deleteComment(id, commentId));
-
-    console.log("deleting...", id, commentId);
   };
 
   const [index, setIndex] = useState(0);
@@ -31,21 +27,30 @@ export const Flashcard = () => {
   //make list of all IDs of user's cards
   let userCards = [];
 
-    user.cards
-      .filter(usercard => parseInt(usercard.date) <= new Date().valueOf())
-      .map((usercard) => userCards.push(parseInt(usercard.id)))
-      console.log(new Date().valueOf())
+  user.cards
+    .filter((usercard) => parseInt(usercard.date) <= new Date().valueOf())
+    .map((usercard) => userCards.push(parseInt(usercard.id)));
+
+
+    console.log("index: ", index)
 
   //set CARD variable to first of an index of cards where ID is in userCards
-  let CARD = CARDS.filter((card) => userCards.includes(card.id))[index];
+  const [CARD, setCARD] = useState(
+    CARDS.filter((card) => userCards.includes(card.id))[index]
+  );
 
-  console.log(userCards);
+  useEffect(() => {
+    setCARD(CARDS.filter((card) => userCards.includes(card.id))[index]);
+  }, [users, index]);
 
   //identify card in user's cards array
-  var USERCARD 
-    useEffect(() => {
-      USERCARD = user.cards.filter((card) => card.id == CARD.id)[0];
-    }, [index])
+  const [USERCARD, setUSERCARD] = useState(
+    user.cards.filter((card) => card.id == CARD?.id)[0]
+  );
+
+  useEffect(() => {
+    setUSERCARD(user.cards.filter((card) => card.id == CARD?.id)[0]);
+  }, [users, index, CARD]);
 
   const handlePrev = () => {
     if (index == 0) {
@@ -83,83 +88,94 @@ export const Flashcard = () => {
         }}
       >
         <center>
-          {CARD.en}
-          <br />
-          {answer ? (
+          {USERCARD && CARD ? (
             <>
-              {CARD.gd}
+              {CARD.en}
               <br />
+              {answer ? (
+                <>
+                  {CARD.gd}
+                  <br />
+                  <br />
+                </>
+              ) : (
+                <>
+                  <br />
+                  <br />
+                </>
+              )}
+              <button onClick={() => setAnswer(!answer)}>Show Answer</button>
               <br />
+              <button
+                onClick={() => {
+                  setAnswer(false);
+                  handlePrev();
+                }}
+              >
+                Prev
+              </button>
+              <button
+                onClick={() => {
+                  setAnswer(false);
+                  handleNext();
+                }}
+              >
+                Next
+              </button>
+
+              <br />
+
+              <button
+                onClick={() => {
+                  USERCARD.date = new Date().valueOf();
+                  USERCARD.delay = 0;
+                  USERCARD.reviews++;
+
+                  handleUpdate(user._id, USERCARD.id, USERCARD);
+                  handleNext();
+                }}
+              >
+                Wrong
+              </button>
+              <button
+                onClick={() => {
+                  if (USERCARD) {
+                    USERCARD.date = new Date().setDate(
+                      new Date().getDate() + (parseInt(USERCARD?.delay) + 1) * 2
+                    );
+                    USERCARD.delay = (parseInt(USERCARD.delay) + 1) * 2;
+                    USERCARD.reviews++;
+
+                    //USERCARD.date = new Date().valueOf()
+                    //USERCARD.delay = 0
+                    //USERCARD.reviews = 0
+
+                    handleUpdate(user._id, USERCARD.id, USERCARD);
+                    handleNext();
+                  }
+                }}
+              >
+                Correct
+              </button>
+              <button
+                onClick={() => {
+                  USERCARD.date = new Date().setDate(
+                    new Date().getDate() + (parseInt(USERCARD.delay) + 1) * 3
+                  );
+                  USERCARD.delay = (parseInt(USERCARD.delay) + 1) * 3;
+                  USERCARD.reviews++;
+                  handleUpdate(user._id, USERCARD.id, USERCARD);
+                  handleNext();
+                }}
+              >
+                Easy
+              </button>
             </>
           ) : (
             <>
-              <br />
-              <br />
-            </>
+            {index > 0 && index > userCards.length-1 && setIndex(index -1)}
+            You don't have any cards to review!</>
           )}
-          <button onClick={() => setAnswer(!answer)}>Show Answer</button>
-          <br />
-          <button
-            onClick={() => {
-              setAnswer(false);
-              handlePrev();
-            }}
-          >
-            Prev
-          </button>
-          <button
-            onClick={() => {
-              setAnswer(false);
-              handleNext();
-            }}
-          >
-            Next
-          </button>
-
-          <br />
-
-          <button
-            onClick={() => {
-              USERCARD.date = new Date().valueOf();
-              USERCARD.delay = 0;
-              USERCARD.reviews++;
-
-              handleUpdate(user._id, USERCARD.id, USERCARD);
-              handleNext();
-            }}
-          >
-            Wrong
-          </button>
-          <button
-            onClick={() => {
-              USERCARD.date = new Date().setDate(
-                new Date().getDate() + (parseInt(USERCARD.delay) + 1) * 2
-              );
-              USERCARD.delay = (parseInt(USERCARD.delay) + 1) * 2;
-              USERCARD.reviews++;
-              //USERCARD.date = new Date().valueOf()
-              //USERCARD.delay = 0
-              //USERCARD.reviews = 0
-
-              handleUpdate(user._id, USERCARD.id, USERCARD);
-              handleNext();
-            }}
-          >
-            Correct
-          </button>
-          <button
-            onClick={() => {
-              USERCARD.date = new Date().setDate(
-                new Date().getDate() + (parseInt(USERCARD.delay) + 1) * 3
-              );
-              USERCARD.delay = (parseInt(USERCARD.delay) + 1) * 3;
-              USERCARD.reviews++;
-              handleUpdate(user._id, USERCARD.id, USERCARD);
-              handleNext();
-            }}
-          >
-            Easy
-          </button>
         </center>
       </div>
       <center>
@@ -172,6 +188,7 @@ export const Flashcard = () => {
             <th>Due</th>
             <th>Delay</th>
             <th>Reviews</th>
+            <th>card id</th>
             <th>Delete</th>
           </tr>
           <span className="tableHr">All words:</span>
@@ -187,8 +204,13 @@ export const Flashcard = () => {
               <td>{new Date(card.date).toLocaleDateString()}</td>
               <td>{card.delay}</td>
               <td>{card.reviews}</td>
+              <td>{card.id}</td>
               <td>
-                <button onClick={() => handleDelete(user._id, card._id)}>
+                <button
+                  onClick={() => {
+                    handleDelete(user._id, card._id, card);
+                  }}
+                >
                   Delete
                 </button>
               </td>

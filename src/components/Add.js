@@ -2,14 +2,18 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getPosts, updatePost } from "../actions/posts";
 import { CARDS } from "./CARDS";
+import { useEffect } from "react";
 
 export const Add = () => {
   const dispatch = useDispatch();
-
   const users = useSelector((state) => state.posts);
   const user = users[0];
 
   const [updateData, setUpdateData] = useState(user);
+
+  useEffect(() => {
+    setUpdateData(user)
+  }, user.cards)
 
   const [newCard, setNewCard] = useState();
 
