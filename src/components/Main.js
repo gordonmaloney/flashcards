@@ -24,9 +24,8 @@ export const Main = () => {
           <Route exact path="/">
           {users.length>0 &&<Add />}
             
-            <Read />
 
-            {users.length>0 &&<Flashcard />}
+            {users.length>0 & users[0]?.cards.length > 0 &&<Flashcard />}
           </Route>
         </Switch>
       </BrowserRouter>
