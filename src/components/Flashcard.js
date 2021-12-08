@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
-import { getPosts, updateComment } from "../actions/posts";
+import { getPosts, updateComment, deleteComment } from "../actions/posts";
 import { CARDS } from "./CARDS";
 
 export const Flashcard = () => {
@@ -19,6 +19,12 @@ export const Flashcard = () => {
     dispatch(updateComment(id, commentId, updatedPost));
   };
 
+  const handleDelete = (id, commentId) => {
+    dispatch(deleteComment(id, commentId))
+
+    console.log("deleting...", id, commentId)
+  }
+
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState(false);
 
@@ -34,8 +40,6 @@ export const Flashcard = () => {
 
     //identify card in user's cards array
     let USERCARD = user.cards.filter((card) => card.id == CARD.id)[0];
-    console.log(new Date(parseInt(USERCARD.date)))
-    console.log(USERCARD)
 
     const handlePrev = () => {
       if (index == 0) {
@@ -159,6 +163,7 @@ export const Flashcard = () => {
               <th>Due</th>
               <th>Delay</th>
               <th>Reviews</th>
+              <th>Delete</th>
             </tr>
             <span className="tableHr">All words:</span>
             <br />
@@ -173,6 +178,9 @@ export const Flashcard = () => {
                 <td>{new Date(card.date).toLocaleDateString()}</td>
                 <td>{card.delay}</td>
                 <td>{card.reviews}</td>
+                <td>
+                  <button onClick={() => handleDelete(user._id, card._id)}>Delete</button>
+                </td>
               </tr>
             ))}
             <br />

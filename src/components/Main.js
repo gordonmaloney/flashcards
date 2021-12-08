@@ -5,6 +5,7 @@ import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import { Home } from "./Home";
 import { Flashcard } from "./Flashcard";
 import { Read } from "./Read";
+import { Add } from "./Add";
 
 
 export const Main = () => {
@@ -21,6 +22,8 @@ export const Main = () => {
       <BrowserRouter>
         <Switch>
           <Route exact path="/">
+          {users.length>0 &&<Add />}
+            
             <Read />
 
             {users.length>0 &&<Flashcard />}
